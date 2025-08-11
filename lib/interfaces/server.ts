@@ -1,24 +1,20 @@
+export type EnvironmentType = 'development' | 'testing' | 'staging' | 'production' | 'sandbox' | 'virtual'
+
 export interface ConfigServerInterface {
-    environment: 'development' | 'production' | 'test' | 'staging'
+    environments: EnvironmentType[]
     storage: {
         paths?: ConfigServerStoragePathsInterface[]
         urls?: ConfigServerStorageUrlsInterface[]
-        git?: ConfigServerStorageGitInterface[]
     }
-    validation?: Record<string, unknown>
-    updateInterval?: number
 }
 
 export interface ConfigServerStoragePathsInterface {
+    service?: string
     path: string
 }
 
 export interface ConfigServerStorageUrlsInterface {
+    service?: string
     url: string
-}
-
-export interface ConfigServerStorageGitInterface {
-    repository: string
-    branch?: string
-    privateKey?: string
+    headers?: Record<string, string>
 }

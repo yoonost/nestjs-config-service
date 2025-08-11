@@ -2,6 +2,7 @@ import { DynamicModule, Module } from '@nestjs/common'
 import { ConfigServerInterface } from '../interfaces/server'
 import { ConfigServerController } from './server.controller'
 import { ConfigServerService } from './server.service'
+import { FetcherService } from './fetcher.service'
 import { ConfigModule } from '@nestjs/config'
 
 @Module({})
@@ -16,7 +17,9 @@ export class ConfigServerModule {
                     useValue: moduleOptions,
                 },
                 ConfigServerService,
+                FetcherService,
             ],
+            exports: [ConfigServerService, FetcherService],
             imports: [ConfigModule],
         }
     }
