@@ -8,13 +8,16 @@ export interface ConfigServerInterface {
     }
 }
 
-export interface ConfigServerStoragePathsInterface {
-    service?: string
+export interface ConfigServerStoragePathsInterface extends ConfigServerStorageCommonInterface {
     path: string
 }
 
-export interface ConfigServerStorageUrlsInterface {
-    service?: string
+export interface ConfigServerStorageUrlsInterface extends ConfigServerStorageCommonInterface {
     url: string
     headers?: Record<string, string>
+}
+
+export interface ConfigServerStorageCommonInterface {
+    environments: EnvironmentType[]
+    service?: string
 }

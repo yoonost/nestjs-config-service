@@ -3,10 +3,6 @@ import { EnvironmentType } from '../interfaces/server'
 import { ConfigServerService } from './server.service'
 import { ConfigService } from '@nestjs/config'
 
-// GET /environments - Returns all available environments
-// GET /:environment/services - Returns all services for the specified environment
-// GET /:environment/:service - Returns the configuration for a specific service in the specified environment
-
 @Controller()
 export class ConfigServerController {
     constructor(
@@ -14,13 +10,26 @@ export class ConfigServerController {
         private readonly configService: ConfigService,
     ) {}
 
+    @Get('environments')
+    public getEnvironments(): any {
+        return this.configServerService.getOptions().environments
+    }
+
+    @Get(':environment/services')
+    public getServicesForEnvironment(@Param('environment') environment: EnvironmentType): any {
+        if (!this.configServerService.getOptions().environments.includes(environment)) {
+            return { error: `Environment '${environment}' not found` }
+        }
+        return Object.keys(this.configService.get(environment) || {})
+    }
+
     @Get(':environment/:service')
-    public getServiceConfig(@Param('environment') environment: EnvironmentType, @Param('service') service: string): any {
+    public getServiceConfigForEnvironment(@Param('environment') environment: EnvironmentType, @Param('service') service: string): any {
         if (!this.configServerService.getOptions().environments.includes(environment)) {
             return { error: `Environment '${environment}' not found` }
         }
 
-        const serviceConfig = this.configService['internalConfig'][service]
+        const serviceConfig = this.configService.get(`${environment}.${service}`)
         if (!serviceConfig) {
             return { error: `Service '${service}' not found in environment '${environment}'` }
         }

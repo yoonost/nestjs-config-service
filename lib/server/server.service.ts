@@ -14,7 +14,7 @@ export class ConfigServerService implements OnModuleInit {
     }
 
     public async onModuleInit(): Promise<void> {
-        await Promise.all([this.fetcherService.fetchStoragePaths(this.options.storage.paths || []), this.fetcherService.fetchStorageUrls(this.options.storage.urls || [])])
+        await Promise.all([this.fetcherService.fetchStoragePaths(this.options), this.fetcherService.fetchStorageUrls(this.options)])
     }
 
     public getOptions(): ConfigServerInterface {
