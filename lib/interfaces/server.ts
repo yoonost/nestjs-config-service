@@ -6,6 +6,7 @@ export interface ConfigServerInterface {
         paths?: ConfigServerStoragePathsInterface[]
         urls?: ConfigServerStorageUrlsInterface[]
     }
+    updateInterval?: number
 }
 
 export interface ConfigServerStoragePathsInterface extends ConfigServerStorageCommonInterface {
