@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common'
+import {Controller, Get, Ip, Param} from '@nestjs/common'
 import { EnvironmentType } from '../interfaces/server'
 import { ConfigServerService } from './server.service'
 import { ConfigService } from '@nestjs/config'
@@ -24,7 +24,11 @@ export class ConfigServerController {
     }
 
     @Get(':environment/:service')
-    public getServiceConfigForEnvironment(@Param('environment') environment: EnvironmentType, @Param('service') service: string): any {
+    public getServiceConfigForEnvironment(
+        @Param('environment') environment: EnvironmentType,
+        @Param('service') service: string,
+        @Ip() ipAddress: string
+    ): any {
         if (!this.configServerService.getOptions().environments.includes(environment)) {
             return { error: `Environment '${environment}' not found` }
         }
@@ -32,6 +36,11 @@ export class ConfigServerController {
         const serviceConfig = this.configService.get(`${environment}.${service}`)
         if (!serviceConfig) {
             return { error: `Service '${service}' not found in environment '${environment}'` }
+        }
+
+        const allowedIps: string[] | null = this.configServerService.getOptions()?.services?.[service]?.allowedIps || null
+        if (allowedIps && !allowedIps.includes(ipAddress)) {
+            return { error: `Access denied for service '${service}' from IP '${ipAddress}'` }
         }
 
         return serviceConfig

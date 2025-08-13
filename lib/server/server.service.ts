@@ -34,8 +34,8 @@ export class ConfigServerService implements OnModuleInit {
         const urlsData: FetchStorageResponseInterface[] = await this.fetcherService.fetchStorageUrls(this.options.storage.urls || [])
 
         for (const fetchData of [...pathsData, ...urlsData]) {
-            if (this.options.validation && this.options.validation[fetchData.serviceName]) {
-                const validationClass: any = this.options.validation[fetchData.serviceName]
+            if (this.options.services && this.options.services[fetchData.serviceName] && this.options.services[fetchData.serviceName].validation) {
+                const validationClass: any = this.options.services[fetchData.serviceName].validation
                 const validationInstance: unknown[] = plainToInstance(validationClass, fetchData.configData, { enableImplicitConversion: true })
                 const errors: ValidationError[] = validateSync(validationInstance, { skipMissingProperties: false })
 

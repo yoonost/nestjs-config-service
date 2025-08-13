@@ -1,5 +1,3 @@
-import { ClassConstructor } from 'class-transformer'
-
 export type EnvironmentType = 'development' | 'testing' | 'staging' | 'production' | 'sandbox' | 'virtual'
 
 export interface ConfigServerInterface {
@@ -7,8 +5,13 @@ export interface ConfigServerInterface {
     storage: {
         paths?: ConfigServerStoragePathsInterface[]
         urls?: ConfigServerStorageUrlsInterface[]
+    },
+    services?: {
+        [serviceName: string]: {
+            allowedIps?: string[]
+            validation?: any
+        }
     }
-    validation?: Record<string, any>
     updateInterval?: number
 }
 
