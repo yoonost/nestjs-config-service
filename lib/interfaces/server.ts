@@ -1,10 +1,6 @@
-export type EnvironmentType = 'development' | 'testing' | 'staging' | 'production' | 'sandbox' | 'virtual'
+import { ClassConstructor } from 'class-transformer'
 
-export interface FetchStorageResponseInterface {
-    serviceName: string
-    serviceEnvironments: EnvironmentType[]
-    configData: any
-}
+export type EnvironmentType = 'development' | 'testing' | 'staging' | 'production' | 'sandbox' | 'virtual'
 
 export interface ConfigServerInterface {
     environments: EnvironmentType[]
@@ -12,6 +8,7 @@ export interface ConfigServerInterface {
         paths?: ConfigServerStoragePathsInterface[]
         urls?: ConfigServerStorageUrlsInterface[]
     }
+    validation?: Record<string, any>
     updateInterval?: number
 }
 
@@ -27,4 +24,10 @@ export interface ConfigServerStorageUrlsInterface extends ConfigServerStorageCom
 export interface ConfigServerStorageCommonInterface {
     environments: EnvironmentType[]
     serviceName?: string
+}
+
+export interface FetchStorageResponseInterface {
+    serviceName: string
+    serviceEnvironments: EnvironmentType[]
+    configData: any
 }

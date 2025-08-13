@@ -1,5 +1,7 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { ConfigServerInterface, EnvironmentType, FetchStorageResponseInterface } from '../interfaces/server'
+import { validateSync, ValidationError } from 'class-validator'
+import { plainToInstance } from 'class-transformer'
 import { FetcherService } from './fetcher.service'
 import { ConfigService } from '@nestjs/config'
 
@@ -18,8 +20,10 @@ export class ConfigServerService implements OnModuleInit {
 
     public async onModuleInit(): Promise<void> {
         if (this.options.updateInterval && this.options.updateInterval > 0) {
-            setInterval(async (): Promise<void> => {
-                await this.fetchStorages(true)
+            setInterval(() => {
+                ;(async () => {
+                    await this.fetchStorages(true)
+                })().catch((err) => console.error(err))
             }, this.options.updateInterval)
         }
         await this.fetchStorages(false)
@@ -29,7 +33,23 @@ export class ConfigServerService implements OnModuleInit {
         const pathsData: FetchStorageResponseInterface[] = await this.fetcherService.fetchStoragePaths(this.options.storage.paths || [])
         const urlsData: FetchStorageResponseInterface[] = await this.fetcherService.fetchStorageUrls(this.options.storage.urls || [])
 
-        for (const fetchData of [...pathsData, ...urlsData]) for (const serviceEnvironment of fetchData.serviceEnvironments) this.addServiceConfigToEnvironment(fetchData.serviceName, serviceEnvironment, fetchData.configData, overwrite)
+        for (const fetchData of [...pathsData, ...urlsData]) {
+            if (this.options.validation && this.options.validation[fetchData.serviceName]) {
+                const validationClass: any = this.options.validation[fetchData.serviceName]
+                const validationInstance: unknown[] = plainToInstance(validationClass, fetchData.configData, { enableImplicitConversion: true })
+                const errors: ValidationError[] = validateSync(validationInstance, { skipMissingProperties: false })
+
+                if (errors.length > 0) {
+                    this.logger.error(`Validation failed for service '${fetchData.serviceName}': ${errors.toString()}`)
+                    continue
+                }
+
+                this.logger.log(`Validation passed for service '${fetchData.serviceName}'`)
+            }
+            for (const serviceEnvironment of fetchData.serviceEnvironments) {
+                this.addServiceConfigToEnvironment(fetchData.serviceName, serviceEnvironment, fetchData.configData, overwrite)
+            }
+        }
     }
 
     private addServiceConfigToEnvironment(serviceName: string, serviceEnvironment: EnvironmentType, configData: any, overwrite: boolean = false): void {
