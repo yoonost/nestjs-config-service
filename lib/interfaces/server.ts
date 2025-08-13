@@ -1,5 +1,11 @@
 export type EnvironmentType = 'development' | 'testing' | 'staging' | 'production' | 'sandbox' | 'virtual'
 
+export interface FetchStorageResponseInterface {
+    serviceName: string
+    serviceEnvironments: EnvironmentType[]
+    configData: any
+}
+
 export interface ConfigServerInterface {
     environments: EnvironmentType[]
     storage: {
@@ -20,5 +26,5 @@ export interface ConfigServerStorageUrlsInterface extends ConfigServerStorageCom
 
 export interface ConfigServerStorageCommonInterface {
     environments: EnvironmentType[]
-    service?: string
+    serviceName?: string
 }
