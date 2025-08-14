@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigServerStoragePathsInterface, ConfigServerStorageUrlsInterface, FetchStorageResponseInterface } from '../interfaces/server'
-import { extractFileNameWithoutExtension } from '../utils/extractFileNameWithoutExtension'
+import { FileSourceInterface, UrlSourceInterface, FetchConfigResponseInterface } from '../interfaces/server.interface'
 import axios, { AxiosResponse } from 'axios'
 import { promises as fs } from 'fs'
 
@@ -8,31 +7,45 @@ import { promises as fs } from 'fs'
 export class FetcherService {
     private readonly logger: Logger = new Logger(FetcherService.name)
 
-    public async fetchStoragePaths(paths: ConfigServerStoragePathsInterface[]): Promise<FetchStorageResponseInterface[]> {
+    public async fetchFileSources(serviceName: string, sources: FileSourceInterface[]): Promise<FetchConfigResponseInterface[]> {
         return await Promise.all(
-            (paths || []).map(async (path: ConfigServerStoragePathsInterface): Promise<FetchStorageResponseInterface> => {
-                const serviceName: string = path.serviceName || extractFileNameWithoutExtension(path.path)
+            (sources || []).map(async (source: FileSourceInterface): Promise<FetchConfigResponseInterface> => {
                 try {
-                    const fileContent: string = await fs.readFile(path.path, 'utf-8')
-                    return { serviceName, serviceEnvironments: path.environments, configData: JSON.parse(fileContent) }
+                    const fileContent: string = await fs.readFile(source.path, 'utf-8')
+                    return {
+                        serviceName,
+                        environments: source.environments,
+                        configData: JSON.parse(fileContent),
+                    }
                 } catch (error) {
-                    this.logger.error(`Failed to fetch storage URL: ${path.path}`, error)
-                    return { serviceName, serviceEnvironments: path.environments, configData: {} }
+                    this.logger.error(`Failed to fetch storage URL: ${source.path}`, error)
+                    return {
+                        serviceName,
+                        environments: source.environments,
+                        configData: {},
+                    }
                 }
             }),
         )
     }
 
-    public async fetchStorageUrls(urls: ConfigServerStorageUrlsInterface[]): Promise<FetchStorageResponseInterface[]> {
+    public async fetchUrlSources(serviceName: string, sources: UrlSourceInterface[]): Promise<FetchConfigResponseInterface[]> {
         return await Promise.all(
-            (urls || []).map(async (url: ConfigServerStorageUrlsInterface): Promise<FetchStorageResponseInterface> => {
-                const serviceName: string = url.serviceName || extractFileNameWithoutExtension(url.url)
+            (sources || []).map(async (source: UrlSourceInterface): Promise<FetchConfigResponseInterface> => {
                 try {
-                    const response: AxiosResponse = await axios.get(url.url, { headers: url.headers })
-                    return { serviceName, serviceEnvironments: url.environments, configData: response.data }
+                    const response: AxiosResponse = await axios.get(source.url, { headers: source.headers })
+                    return {
+                        serviceName,
+                        environments: source.environments,
+                        configData: response.data,
+                    }
                 } catch (error) {
-                    this.logger.error(`Failed to fetch storage URL: ${url.url}`, error)
-                    return { serviceName, serviceEnvironments: url.environments, configData: {} }
+                    this.logger.error(`Failed to fetch storage URL: ${source.url}`, error)
+                    return {
+                        serviceName,
+                        environments: source.environments,
+                        configData: {},
+                    }
                 }
             }),
         )

@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { ConfigServerInterface, EnvironmentType, FetchStorageResponseInterface } from '../interfaces/server'
+import { ConfigServerInterface, ConfigSourceType, EnvironmentType, FetchConfigResponseInterface, FileSourceInterface, ServiceConfigInterface, UrlSourceInterface } from '../interfaces/server.interface'
 import { validateSync, ValidationError } from 'class-validator'
 import { plainToInstance } from 'class-transformer'
 import { FetcherService } from './fetcher.service'
@@ -11,7 +11,8 @@ export class ConfigServerService implements OnModuleInit {
     private readonly options: ConfigServerInterface
 
     constructor(
-        @Inject('CONFIG_SERVER_OPTIONS') private readonly moduleOptions: ConfigServerInterface,
+        @Inject('CONFIG_SERVER_OPTIONS')
+        private readonly moduleOptions: ConfigServerInterface,
         private readonly fetcherService: FetcherService,
         private readonly configService: ConfigService,
     ) {
@@ -22,32 +23,47 @@ export class ConfigServerService implements OnModuleInit {
         if (this.options.updateInterval && this.options.updateInterval > 0) {
             setInterval(() => {
                 ;(async () => {
-                    await this.fetchStorages(true)
+                    await this.fetchSources(true)
                 })().catch((err) => console.error(err))
             }, this.options.updateInterval)
         }
-        await this.fetchStorages(false)
+        await this.fetchSources(false)
     }
 
-    private async fetchStorages(overwrite: boolean = false): Promise<void> {
-        const pathsData: FetchStorageResponseInterface[] = await this.fetcherService.fetchStoragePaths(this.options.storage.paths || [])
-        const urlsData: FetchStorageResponseInterface[] = await this.fetcherService.fetchStorageUrls(this.options.storage.urls || [])
+    private async fetchSources(overwrite: boolean = false): Promise<void> {
+        for (const serviceName in this.options.services) {
+            const service: ServiceConfigInterface = this.options.services[serviceName]
 
-        for (const fetchData of [...pathsData, ...urlsData]) {
-            if (this.options.services && this.options.services[fetchData.serviceName] && this.options.services[fetchData.serviceName].validation) {
-                const validationClass: any = this.options.services[fetchData.serviceName].validation
-                const validationInstance: unknown[] = plainToInstance(validationClass, fetchData.configData, { enableImplicitConversion: true })
-                const errors: ValidationError[] = validateSync(validationInstance, { skipMissingProperties: false })
-
-                if (errors.length > 0) {
-                    this.logger.error(`Validation failed for service '${fetchData.serviceName}': ${errors.toString()}`)
-                    continue
-                }
-
-                this.logger.log(`Validation passed for service '${fetchData.serviceName}'`)
+            if (!service.sources || service.sources.length === 0) {
+                this.logger.warn(`No sources defined for service '${serviceName}'. Skipping fetch.`)
+                continue
             }
-            for (const serviceEnvironment of fetchData.serviceEnvironments) {
-                this.addServiceConfigToEnvironment(fetchData.serviceName, serviceEnvironment, fetchData.configData, overwrite)
+
+            const fetchFileData: FetchConfigResponseInterface[] = await this.fetcherService.fetchFileSources(
+                serviceName,
+                service.sources.filter((source: ConfigSourceType): source is FileSourceInterface => source.type === 'file'),
+            )
+            const fetchUrlData: FetchConfigResponseInterface[] = await this.fetcherService.fetchUrlSources(
+                serviceName,
+                service.sources.filter((source: ConfigSourceType): source is UrlSourceInterface => source.type === 'url'),
+            )
+
+            for (const data of [...fetchFileData, ...fetchUrlData]) {
+                if (service.validationRules) {
+                    const validationClass: any = service.validationRules
+                    const validationInstance: unknown[] = plainToInstance(validationClass, data.configData, { enableImplicitConversion: true })
+                    const errors: ValidationError[] = validateSync(validationInstance, { skipMissingProperties: false })
+
+                    if (errors.length > 0) {
+                        this.logger.error(`Validation failed for service '${serviceName}': ${errors.toString()}`)
+                        continue
+                    }
+
+                    this.logger.log(`Validation passed for service '${serviceName}'`)
+                }
+                for (const serviceEnvironment of data.environments) {
+                    this.addServiceConfigToEnvironment(data.serviceName, serviceEnvironment, data.configData, overwrite)
+                }
             }
         }
     }
@@ -59,7 +75,10 @@ export class ConfigServerService implements OnModuleInit {
             this.logger.warn(`Service '${serviceName}' already exists in environment '${serviceEnvironment}'. Skipping addition.`)
         }
         const currentConfig: any = this.configService.get(serviceEnvironment) || {}
-        this.configService.set(serviceEnvironment, { ...currentConfig, [serviceName]: configData })
+        this.configService.set(serviceEnvironment, {
+            ...currentConfig,
+            [serviceName]: configData,
+        })
         this.logger.log(`Service '${serviceName}' ${overwrite ? 'rewritten' : 'added'} in environment '${serviceEnvironment}'`)
     }
 

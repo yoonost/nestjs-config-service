@@ -1,9 +1,9 @@
 {
     "name": "nestjs-config-service",
     "description": "Provides server-side and client-side support for external configuration in a distributed system. With Config Server, you have a centralized location to manage external application properties across all environments.",
-    "license": "ISC",
+    "license": "MIT",
     "author": "Serhii Pomazan <sergeypomazan2005@gmail.com>",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "main": "./dist/index.js",
     "homepage": "https://github.com/yoonost/nestjs-config-service#readme",
     "bugs": {

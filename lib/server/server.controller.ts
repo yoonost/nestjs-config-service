@@ -1,7 +1,8 @@
-import {Controller, Get, Ip, Param} from '@nestjs/common'
-import { EnvironmentType } from '../interfaces/server'
+import { Controller, Get, Ip, Param } from '@nestjs/common'
+import { EnvironmentType } from '../interfaces/server.interface'
 import { ConfigServerService } from './server.service'
 import { ConfigService } from '@nestjs/config'
+import { UserAgent } from '../decorators/user-agent.decorator'
 
 @Controller()
 export class ConfigServerController {
@@ -24,16 +25,12 @@ export class ConfigServerController {
     }
 
     @Get(':environment/:service')
-    public getServiceConfigForEnvironment(
-        @Param('environment') environment: EnvironmentType,
-        @Param('service') service: string,
-        @Ip() ipAddress: string
-    ): any {
+    public getServiceConfigForEnvironment(@Param('environment') environment: EnvironmentType, @Param('service') service: string, @Ip() ipAddress: string, @UserAgent() userAgent: string): any {
         if (!this.configServerService.getOptions().environments.includes(environment)) {
             return { error: `Environment '${environment}' not found` }
         }
 
-        const serviceConfig = this.configService.get(`${environment}.${service}`)
+        const serviceConfig: any = this.configService.get(`${environment}.${service}`)
         if (!serviceConfig) {
             return { error: `Service '${service}' not found in environment '${environment}'` }
         }
@@ -41,6 +38,11 @@ export class ConfigServerController {
         const allowedIps: string[] | null = this.configServerService.getOptions()?.services?.[service]?.allowedIps || null
         if (allowedIps && !allowedIps.includes(ipAddress)) {
             return { error: `Access denied for service '${service}' from IP '${ipAddress}'` }
+        }
+
+        const allowedUserAgents: string[] | null = this.configServerService.getOptions()?.services?.[service]?.allowedUserAgents || null
+        if (allowedUserAgents && !allowedUserAgents.includes(userAgent)) {
+            return { error: `Access denied for service '${service}' from User-Agent '${userAgent}'` }
         }
 
         return serviceConfig
