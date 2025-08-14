@@ -12,18 +12,10 @@ export class FetcherService {
             (sources || []).map(async (source: FileSourceInterface): Promise<FetchConfigResponseInterface> => {
                 try {
                     const fileContent: string = await fs.readFile(source.path, 'utf-8')
-                    return {
-                        serviceName,
-                        environments: source.environments,
-                        configData: JSON.parse(fileContent),
-                    }
+                    return { serviceName, environments: source.environments, configData: JSON.parse(fileContent) }
                 } catch (error) {
-                    this.logger.error(`Failed to fetch storage URL: ${source.path}`, error)
-                    return {
-                        serviceName,
-                        environments: source.environments,
-                        configData: {},
-                    }
+                    this.logger.error(`Failed to fetch storage URL: ${source.path}`, error.message)
+                    return { serviceName, environments: source.environments, configData: {} }
                 }
             }),
         )
@@ -34,18 +26,10 @@ export class FetcherService {
             (sources || []).map(async (source: UrlSourceInterface): Promise<FetchConfigResponseInterface> => {
                 try {
                     const response: AxiosResponse = await axios.get(source.url, { headers: source.headers })
-                    return {
-                        serviceName,
-                        environments: source.environments,
-                        configData: response.data,
-                    }
+                    return { serviceName, environments: source.environments, configData: response.data }
                 } catch (error) {
-                    this.logger.error(`Failed to fetch storage URL: ${source.url}`, error)
-                    return {
-                        serviceName,
-                        environments: source.environments,
-                        configData: {},
-                    }
+                    this.logger.error(`Failed to fetch storage URL: ${source.url}`, error.message)
+                    return { serviceName, environments: source.environments, configData: {} }
                 }
             }),
         )

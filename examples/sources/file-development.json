@@ -1,0 +1,26 @@
+{
+    "postgres": {
+        "host": "development host",
+        "port": 5432,
+        "user": "development user",
+        "password": "development password",
+        "database": "development database"
+    },
+    "redis": {
+        "host": "development host",
+        "port": 6379,
+        "password": "development password"
+    },
+    "rabbitmq": {
+        "host": "development host",
+        "port": 5672,
+        "user": "development user",
+        "password": "development password"
+    },
+    "kafka": {
+        "host": "development host",
+        "port": 9092,
+        "user": "development user",
+        "password": "development password"
+    }
+}

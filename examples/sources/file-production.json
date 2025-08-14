@@ -1,0 +1,26 @@
+{
+    "postgres": {
+        "host": "production host",
+        "port": 5432,
+        "user": "production user",
+        "password": "production password",
+        "database": "production database"
+    },
+    "redis": {
+        "host": "production host",
+        "port": 6379,
+        "password": "production password"
+    },
+    "rabbitmq": {
+        "host": "production host",
+        "port": 5672,
+        "user": "production user",
+        "password": "production password"
+    },
+    "kafka": {
+        "host": "production host",
+        "port": 9092,
+        "user": "production user",
+        "password": "production password"
+    }
+}
