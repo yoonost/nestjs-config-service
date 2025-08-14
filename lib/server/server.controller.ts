@@ -1,4 +1,4 @@
-import { Controller, Get, Ip, Param } from '@nestjs/common'
+import {Controller, Get, HttpException, HttpStatus, Ip, Param} from '@nestjs/common'
 import { EnvironmentType } from '../interfaces/server.interface'
 import { ConfigServerService } from './server.service'
 import { ConfigService } from '@nestjs/config'

@@ -1,3 +1,11 @@
 /.idea
 /dist
 /node_modules
+
+/examples/client/.idea
+/examples/client/dist
+/examples/client/node_modules
+
+/examples/server/.idea
+/examples/server/dist
+/examples/server/node_modules

@@ -16,7 +16,8 @@
     "scripts": {
         "build": "rimraf -rf dist && tsc -p tsconfig.json",
         "format": "prettier --write \"lib/**/*.ts\"",
-        "lint": "eslint \"lib/**/*.ts\" --fix"
+        "lint": "eslint \"lib/**/*.ts\" --fix",
+        "test": "jest"
     },
     "dependencies": {
         "@nestjs/common": "^11.0.0",
@@ -27,15 +28,28 @@
         "fs": "^0.0.1-security"
     },
     "devDependencies": {
+        "@nestjs/testing": "^11.0.1",
         "@eslint/eslintrc": "^3.2.0",
         "@eslint/js": "^9.18.0",
         "@types/node": "^24.2.0",
+        "@types/jest": "^30.0.0",
         "eslint": "^9.18.0",
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-prettier": "^5.2.2",
         "globals": "^16.0.0",
+        "jest": "^30.0.0",
+        "ts-jest": "^29.2.5",
         "rimraf": "^6.0.1",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.20.0"
+    },
+    "jest": {
+        "moduleFileExtensions": [ "js", "json", "ts" ],
+        "rootDir": "lib",
+        "testRegex": ".*\\.spec\\.ts$",
+        "transform": { "^.+\\.(t|j)s$": "ts-jest" },
+        "collectCoverageFrom": [ "**/*.(t|j)s" ],
+        "coverageDirectory": "../coverage",
+        "testEnvironment": "node"
     }
 }
