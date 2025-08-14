@@ -1,0 +1,33 @@
+{
+    "postgres": {
+        "host": "localhost",
+        "port": 5432,
+        "user": "postgres",
+        "password": "your_password",
+        "database": "your_database"
+    },
+    "mysql": {
+        "host": "localhost",
+        "port": 5432,
+        "user": "postgres",
+        "password": "your_password",
+        "database": "your_database"
+    },
+    "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "password": "your_password"
+    },
+    "rabbitmq": {
+        "host": "localhost",
+        "port": 5672,
+        "user": "guest",
+        "password": "guest"
+    },
+    "kafka": {
+        "host": "localhost",
+        "port": 9092,
+        "user": "kafka",
+        "password": "kafka_password"
+    }
+}
