@@ -1,0 +1,15 @@
+name: publish
+
+on:
+  workflow_run:
+    workflows: ["testing"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Deploy
+        run: echo "Deploying after tests..."
