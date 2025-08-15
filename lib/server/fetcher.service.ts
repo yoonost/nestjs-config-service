@@ -13,8 +13,9 @@ export class FetcherService {
                 try {
                     const fileContent: string = await fs.readFile(source.path, 'utf-8')
                     return { serviceName, environments: source.environments, configData: JSON.parse(fileContent) }
-                } catch (error) {
-                    this.logger.error(`Failed to fetch storage URL: ${source.path}`, error.message)
+                } catch (error: unknown) {
+                    const message: string = error instanceof Error ? error.message : JSON.stringify(error)
+                    this.logger.error(`Failed to fetch storage URL: ${source.path}`, message)
                     return { serviceName, environments: source.environments, configData: {} }
                 }
             }),
@@ -27,8 +28,9 @@ export class FetcherService {
                 try {
                     const response: AxiosResponse = await axios.get(source.url, { headers: source.headers })
                     return { serviceName, environments: source.environments, configData: response.data }
-                } catch (error) {
-                    this.logger.error(`Failed to fetch storage URL: ${source.url}`, error.message)
+                } catch (error: unknown) {
+                    const message: string = error instanceof Error ? error.message : JSON.stringify(error)
+                    this.logger.error(`Failed to fetch storage URL: ${source.url}`, message)
                     return { serviceName, environments: source.environments, configData: {} }
                 }
             }),
