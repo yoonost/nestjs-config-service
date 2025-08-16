@@ -1,5 +1,7 @@
+import { EnvironmentType } from './server.interface'
+
 export interface ConfigClientInterface {
     hostname: string
-    environment: string
+    environment: EnvironmentType
     serviceName: string
 }
