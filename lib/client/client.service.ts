@@ -1,9 +1,11 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common'
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { ConfigClientInterface } from '../interfaces/client.interface'
 import { ConfigService } from '@nestjs/config'
+import axios, { AxiosResponse } from 'axios'
 
 @Injectable()
 export class ConfigClientService implements OnModuleInit {
+    private readonly logger: Logger = new Logger(ConfigClientService.name)
     private readonly options: ConfigClientInterface
 
     constructor(
@@ -15,24 +17,28 @@ export class ConfigClientService implements OnModuleInit {
     }
 
     public async onModuleInit(): Promise<void> {
-        this.configService.set('service-example', {
-            name: 'Example Service',
-            description: 'This is an example service configuration.',
-            version: '1.0.0',
-            environment: this.options.environment,
-        })
+        try {
+            const response: AxiosResponse = await axios.get(`http://${this.options.hostname}/${this.options.environment}/${this.options.serviceName}`, {
+                headers: { 'User-Agent': 'PostmanRuntime/7.45.0' },
+            })
+            this.logger.log(`Successfully resolved module configuration for ${this.options.serviceName}.`)
+            this.configService.set(this.options.serviceName, response.data)
+        } catch (error: unknown) {
+            const message: any = error instanceof Error ? error : JSON.stringify(error)
+            this.logger.error(`Failed to fetch configuration for service '${this.options.serviceName}'`, message)
+        }
     }
 
     public get<T = any>(key: string): T | undefined {
-        return this.configService.get<T>(`service-example.${key}`)
+        return this.configService.get<T>(`${this.options.serviceName}.${key}`)
     }
 
     public getOrThrow<T = any>(key: string): T {
-        const value = this.get<T>(key);
+        const value = this.get<T>(key)
         if (value === undefined) {
-            throw new Error(`Configuration key '${key}' not found`);
+            throw new Error(`Configuration key '${key}' not found`)
         }
-        return value;
+        return value
     }
 
     public getOptions(): ConfigClientInterface {

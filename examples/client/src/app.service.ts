@@ -6,6 +6,6 @@ export class AppService {
     constructor(private readonly configClientService: ConfigClientService) {}
 
     getHello(): string | undefined  {
-        return this.configClientService.get('description')
+        return this.configClientService.get('postgres')
     }
 }

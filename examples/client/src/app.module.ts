@@ -6,9 +6,9 @@ import {ConfigClientModule} from "nestjs-config-service";
 @Module({
     imports: [
         ConfigClientModule.forRoot({
-            hostname: 'localhost',
+            hostname: '127.0.0.1:3000',
             environment: 'development',
-            serviceName: 'example-client-service',
+            serviceName: 'example-one-service',
         })
     ],
     controllers: [AppController],

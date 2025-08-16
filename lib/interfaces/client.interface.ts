@@ -4,4 +4,7 @@ export interface ConfigClientInterface {
     hostname: string
     environment: EnvironmentType
     serviceName: string
+
+    // retry
+    // useragent
 }

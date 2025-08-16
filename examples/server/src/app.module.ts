@@ -9,7 +9,7 @@ import { ValidationService } from './validation'
             services: {
                 'example-one-service': {
                     allowedIps: ['::ffff:127.0.0.1'],
-                    allowedUserAgents: ['PostmanRuntime/7.45.0'],
+                    allowedUserAgents: ['PostmanRuntime/7.45.0', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0'],
                     validationRules: ValidationService,
                     sources: [
                         {
@@ -26,7 +26,7 @@ import { ValidationService } from './validation'
                 },
                 'example-two-service': {
                     allowedIps: ['::ffff:127.0.0.1'],
-                    allowedUserAgents: ['PostmanRuntime/7.45.0'],
+                    allowedUserAgents: ['PostmanRuntime/7.45.0', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0'],
                     validationRules: ValidationService,
                     sources: [
                         {
