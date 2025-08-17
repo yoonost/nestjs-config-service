@@ -4,7 +4,8 @@ export interface ConfigClientInterface {
     hostname: string
     environment: EnvironmentType
     serviceName: string
-
-    // retry
-    // useragent
+    userAgent?: string
+    timeout?: number
+    retryAttempts?: number
+    retryDelay?: number
 }

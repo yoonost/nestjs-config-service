@@ -10,6 +10,7 @@ export interface FetchConfigResponseInterface {
 export interface ConfigServerInterface {
     environments: EnvironmentType[]
     services: Record<string, ServiceConfigInterface>
+    webInterface?: WebInterfaceInterface
     updateInterval?: number
 }
 
@@ -33,4 +34,10 @@ export interface UrlSourceInterface extends ServiceConfigSourceBaseInterface {
 
 export interface ServiceConfigSourceBaseInterface {
     environments: EnvironmentType[]
+}
+
+export interface WebInterfaceInterface {
+    enabled?: boolean
+    path?: string
+    accessToken?: string
 }
