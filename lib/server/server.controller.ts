@@ -3,6 +3,7 @@ import { EnvironmentType } from '../interfaces/server.interface'
 import { ConfigServerService } from './server.service'
 import { ConfigService } from '@nestjs/config'
 import { UserAgent } from '../decorators/user-agent.decorator'
+import { Authorization } from '../decorators/authorization.decorator'
 
 @Controller()
 export class ConfigServerController {
@@ -25,7 +26,7 @@ export class ConfigServerController {
     }
 
     @Get(':environment/:service')
-    public getServiceConfigForEnvironment(@Param('environment') environment: EnvironmentType, @Param('service') service: string, @Ip() ipAddress: string, @UserAgent() userAgent: string): any {
+    public getServiceConfigForEnvironment(@Param('environment') environment: EnvironmentType, @Param('service') service: string, @Ip() ipAddress: string, @UserAgent() userAgent: string, @Authorization() authorizationToken: string): any {
         if (!this.configServerService.getOptions().environments.includes(environment)) {
             return { error: `Environment '${environment}' not found` }
         }
@@ -43,6 +44,11 @@ export class ConfigServerController {
         const allowedUserAgents: string[] | null = this.configServerService.getOptions()?.services?.[service]?.allowedUserAgents || null
         if (allowedUserAgents && !allowedUserAgents.includes(userAgent)) {
             return { error: `Access denied for service '${service}' from User-Agent '${userAgent}'` }
+        }
+
+        const allowedAuthTokens: string[] | null = this.configServerService.getOptions()?.services?.[service]?.allowedAuthTokens || null
+        if (allowedAuthTokens && !allowedAuthTokens.includes(authorizationToken)) {
+            return { error: `Access denied for service '${service}' due to invalid authentication token` }
         }
 
         return serviceConfig

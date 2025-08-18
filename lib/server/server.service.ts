@@ -75,10 +75,7 @@ export class ConfigServerService implements OnModuleInit {
             this.logger.warn(`Service '${serviceName}' already exists in environment '${serviceEnvironment}'. Skipping addition.`)
         }
         const currentConfig: any = this.configService.get(serviceEnvironment) || {}
-        this.configService.set(serviceEnvironment, {
-            ...currentConfig,
-            [serviceName]: configData,
-        })
+        this.configService.set(serviceEnvironment, { ...currentConfig, [serviceName]: configData })
         this.logger.log(`Service '${serviceName}' ${overwrite ? 'rewritten' : 'added'} in environment '${serviceEnvironment}'`)
     }
 

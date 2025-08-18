@@ -10,13 +10,13 @@ export interface FetchConfigResponseInterface {
 export interface ConfigServerInterface {
     environments: EnvironmentType[]
     services: Record<string, ServiceConfigInterface>
-    webInterface?: WebInterfaceInterface
     updateInterval?: number
 }
 
 export interface ServiceConfigInterface {
-    allowedIps?: string[]
-    allowedUserAgents?: string[]
+    allowedIps?: string[] // IP addresses allowed to access the service
+    allowedUserAgents?: string[] // User-Agents allowed to access the service
+    allowedAuthTokens?: string[] // Authentication tokens allowed to access the service
     validationRules?: any
     sources?: ConfigSourceType[]
 }
@@ -34,10 +34,4 @@ export interface UrlSourceInterface extends ServiceConfigSourceBaseInterface {
 
 export interface ServiceConfigSourceBaseInterface {
     environments: EnvironmentType[]
-}
-
-export interface WebInterfaceInterface {
-    enabled?: boolean
-    path?: string
-    accessToken?: string
 }
